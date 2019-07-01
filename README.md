@@ -1,4 +1,4 @@
-# json_editor
+# json_to_flutter_editor
 
 A new Flutter project.
 

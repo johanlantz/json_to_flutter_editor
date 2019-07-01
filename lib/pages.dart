@@ -62,7 +62,13 @@ const firstPage = {
                 "RaisedButton": {
                   "onPressed": {
                     "actions": [
-                      {"type": "submit"},
+                      {
+                        "type": "post",
+                        "data": {
+                          "uri": "https://example.com",
+                          "token": "abcd1234"
+                        }
+                      },
                       {
                         "type": "navigate",
                         "data": {

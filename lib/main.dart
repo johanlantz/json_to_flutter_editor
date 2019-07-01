@@ -1,22 +1,47 @@
-import 'package:flutter_web/material.dart';
-import 'package:json_editor/pages.dart';
-import 'package:json_to_flutter/builders/builders.dart';
+import 'package:flutter/material.dart';
+import 'pages.dart';
+import 'package:json_to_flutter/actions/action_handler_nav.dart';
+import 'package:json_to_flutter/actions/action_handler_post.dart';
+import 'package:json_to_flutter/actions/action_handler_registry.dart';
 import 'package:json_to_flutter/json_to_flutter.dart';
+import 'package:json_to_flutter/content/content_handler_registry.dart';
+import 'package:json_to_flutter/content/content_handler_mem.dart';
+import 'package:json_to_flutter/content/content_handler_link.dart';
+import 'package:json_to_flutter/builders/builders.dart';
 
 void main() => runApp(MyApp());
+
+Widget getDynamicPage(String contentKey) {
+  // Register our action handlers
+  var actionHandlerRegistry = ActionHandlerRegistry();
+  actionHandlerRegistry.registerActionHandler(ActionHandlerNav());
+  actionHandlerRegistry.registerActionHandler(ActionHandlerPost());
+
+  // Register our content handlers
+  var contentHandlerRegistry = ContentHandlerRegistry();
+  var contentHandlerMem = ContentHandlerMem();
+  contentHandlerMem.registerContent('firstPage', firstPage);
+  contentHandlerMem.registerContent('firstPage', firstPage);
+  contentHandlerMem.registerContent('secondPage', secondPage);
+  contentHandlerMem.registerContent('thirdPage', thirdPage);
+  contentHandlerMem.registerContent('fourthPage', fourthPage);
+  contentHandlerMem.registerContent('fifthPage', fifthPage);
+  contentHandlerMem.registerContent('sixthPage', sixthPage);
+  contentHandlerMem.registerContent('seventhPage', seventhPage);
+  contentHandlerRegistry.registerContentHandler(contentHandlerMem);
+
+  var contentHandlerLink = ContentHandlerLink();
+  contentHandlerLink.registerContent('githubPage1', 'https://raw.githubusercontent.com/johanlantz/pages/master/app1/githubPage1');
+  contentHandlerRegistry.registerContentHandler(contentHandlerLink);
+
+  return JSONToFlutter.getPage(
+      contentKey, contentHandlerRegistry, actionHandlerRegistry);
+}
 
 class MyApp extends StatelessWidget {
  
 
   MyApp() {
-    contentRegistry.registerContent("firstPage", firstPage);
-    contentRegistry.registerContent("firstPage", firstPage );
-    contentRegistry.registerContent("secondPage", secondPage );
-    contentRegistry.registerContent("thirdPage", thirdPage );
-    contentRegistry.registerContent("fourthPage", fourthPage );
-    contentRegistry.registerContent("fifthPage", fifthPage );
-    contentRegistry.registerContent("sixthPage", sixthPage );
-    contentRegistry.registerContent("seventhPage", seventhPage );
     registerExternalWidget("ExternalWidget", ExternalWidgetBuilder());
     //registerExternalWidget('TouchRecorder', TouchRecorderBuilder());
   }
@@ -37,7 +62,7 @@ class MyApp extends StatelessWidget {
               child: SizedBox(
                   width: 375,
                   height: 667,
-                  child: JSONToFlutter.getPage('firstPage', contentRegistry)),
+                  child: getDynamicPage('firstPage')),
             ),
           ],
         ),
@@ -56,86 +81,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class NativePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text('This is a native page'),
-        RaisedButton(
-          child: Text('Click me to go to jtf page'),
-          onPressed: () {
-            Navigator.pushNamed(context, 'jtfScreen');
-          },
-        )
-      ],
-    );
-  }
-}
 
-class NativePage2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text('This is native page 2'),
-        RaisedButton(
-          child: Text('Click me to go to jtf'),
-          onPressed: () {
-            Navigator.pushNamed(context, 'jtfScreen');
-          },
-        )
-      ],
-    );
-  }
-}
-
-class NativePage3 extends StatefulWidget {
-  @override
-  _NativePage3State createState() => _NativePage3State();
-}
-
-class _NativePage3State extends State<NativePage3> with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  didPopRoute() {
-    return new Future<bool>.value(true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => true,
-      child: Column(
-        children: <Widget>[
-          Text('This is native page 3'),
-          RaisedButton(
-            child: Text('Click me to go to jtf second page'),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          JSONToFlutter.getPage('secondPage', contentRegistry)));
-              // Navigator.pushNamed(context, 'jtfScreen');
-            },
-          )
-        ],
-      ),
-    );
-  }
-}
 
 // If it complains here most likely we are mixing flutter_web/material with normal flutter/material
 class ExternalWidgetBuilder with WidgetBuilderBase {
