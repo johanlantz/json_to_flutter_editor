@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'components/preview.dart';
+import 'editor_state.dart';
 import 'pages.dart';
 import 'package:json_to_flutter/actions/action_handler_nav.dart';
 import 'package:json_to_flutter/actions/action_handler_post.dart';
@@ -8,6 +10,7 @@ import 'package:json_to_flutter/content/content_handler_registry.dart';
 import 'package:json_to_flutter/content/content_handler_mem.dart';
 import 'package:json_to_flutter/content/content_handler_link.dart';
 import 'package:json_to_flutter/builders/builders.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -31,7 +34,8 @@ Widget getDynamicPage(String contentKey) {
   contentHandlerRegistry.registerContentHandler(contentHandlerMem);
 
   var contentHandlerLink = ContentHandlerLink();
-  contentHandlerLink.registerContent('githubPage1', 'https://raw.githubusercontent.com/johanlantz/pages/master/app1/githubPage1');
+  contentHandlerLink.registerContent('githubPage1',
+      'https://raw.githubusercontent.com/johanlantz/pages/master/app1/githubPage1');
   contentHandlerRegistry.registerContentHandler(contentHandlerLink);
 
   return JSONToFlutter.getPage(
@@ -39,49 +43,44 @@ Widget getDynamicPage(String contentKey) {
 }
 
 class MyApp extends StatelessWidget {
- 
-
   MyApp() {
     registerExternalWidget("ExternalWidget", ExternalWidgetBuilder());
     //registerExternalWidget('TouchRecorder', TouchRecorderBuilder());
   }
 
   Widget getOverviewPage() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Column(
-            children: <Widget>[Text("hi")],
-          ),
-        ),
-        Column(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(width: 3.0, color: Colors.black)),
-              child: SizedBox(
-                  width: 375,
-                  height: 667,
-                  child: getDynamicPage('firstPage')),
+    return Scaffold(
+      body: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              children: <Widget>[Text("hi")],
             ),
-          ],
-        ),
-      ],
+          ),
+          Container(
+            margin: EdgeInsets.only(right: 10),
+            child: Preview(),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter Demo.',
-        routes: {'/': (context) => getOverviewPage()},
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ));
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<EditorState>(
+              builder: (context) => EditorState(getDynamicPage('firstPage'))),
+        ],
+        child: MaterialApp(
+            title: 'Flutter Demo.',
+            routes: {'/': (context) => getOverviewPage()},
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            )));
   }
 }
-
-
 
 // If it complains here most likely we are mixing flutter_web/material with normal flutter/material
 class ExternalWidgetBuilder with WidgetBuilderBase {
