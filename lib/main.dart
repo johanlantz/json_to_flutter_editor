@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:json_to_flutter_editor/components/raw_editor.dart';
 import 'components/preview.dart';
 import 'editor_state.dart';
 import 'pages.dart';
@@ -12,7 +14,12 @@ import 'package:json_to_flutter/content/content_handler_link.dart';
 import 'package:json_to_flutter/builders/builders.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+
+void main() {
+  // Enable fullscreen
+  SystemChrome.setEnabledSystemUIOverlays([]);
+  runApp(MyApp());
+}
 
 Widget getDynamicPage(String contentKey) {
   // Register our action handlers
@@ -56,6 +63,10 @@ class MyApp extends StatelessWidget {
             child: Column(
               children: <Widget>[Text("hi")],
             ),
+          ),
+          Container(
+            width: 400,
+            child:  RawEditor()
           ),
           Container(
             margin: EdgeInsets.only(right: 10),

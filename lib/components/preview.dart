@@ -31,7 +31,6 @@ class _PreviewState extends State<Preview> {
     var editorState = Provider.of<EditorState>(context);
     return Column(
       children: <Widget>[
-        Container(margin: EdgeInsets.only(top: 15),),
         DropdownButton<String>(
           value: resolutionDropdownValue,
           onChanged: (String newValue) {
