@@ -13,18 +13,25 @@ class _RawEditorState extends State<RawEditor> {
   List<String> _contentWip = [];
 
   var _controller = TextEditingController();
+  String jsonValidationErrorMessage = "";
+
+  _validateJson(String updatedJson) {
+    JsonDecoder decoder = JsonDecoder();
+    try {
+      decoder.convert(updatedJson);
+      print('Updated data is valid json.');
+      jsonValidationErrorMessage = "";
+      return true;
+    } on FormatException catch (e) {
+      _controller.selection =
+          TextSelection(baseOffset: e.offset, extentOffset: e.offset - 20);
+          jsonValidationErrorMessage = 'Invalid json string at offset ${e.offset}';
+          return false;
+    }
+  }
 
   _updateContent(String updatedJson) {
-    JsonDecoder decoder = JsonDecoder();
-    var object;
-    try {
-      object = decoder.convert(updatedJson);
-      print('Updated data is valid json.');
-      _contentWip = [];
-    } on FormatException catch (e) {
-      print('Invalid json string at offset ${e.offset}');
-      _controller.selection = TextSelection(baseOffset: e.offset, extentOffset: e.offset-10);
-    }
+    _contentWip = [];
   }
 
   @override
@@ -53,28 +60,37 @@ class _RawEditorState extends State<RawEditor> {
                   IconButton(
                     icon: Icon(Icons.check),
                     color: Colors.green,
-                    onPressed: () {
+                    onPressed: _validateJson(_controller.text) == false ? null : () {
                       _updateContent(_controller.text);
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.undo),
                     color: Colors.red,
-                    onPressed: _contentWip.length == 0 ? null : () {
-                      setState(() {
-                        _contentWip.removeLast();
-                      });
-                    },
+                    onPressed: _contentWip.length == 0
+                        ? null
+                        : () {
+                            setState(() {
+                              _contentWip.removeLast();
+                            });
+                          },
                   ),
                   IconButton(
                     icon: Icon(Icons.cancel),
                     color: Colors.red,
-                    onPressed: _contentWip.length == 0 ? null : () {
-                      setState(() {
-                        _contentWip = [];
-                      });
-                    },
+                    onPressed: _contentWip.length == 0
+                        ? null
+                        : () {
+                            setState(() {
+                              _contentWip = [];
+                            });
+                          },
                   )
+                ]),
+                Row(children: <Widget>[
+                  Visibility(
+                    visible: jsonValidationErrorMessage.length > 0,
+                    child: Text(jsonValidationErrorMessage, style: TextStyle(color: Colors.red)))
                 ]),
                 Expanded(
                     child: TextField(
@@ -84,7 +100,7 @@ class _RawEditorState extends State<RawEditor> {
                         onChanged: (data) {
                           setState(() {
                             _contentWip.add(data);
-                          }); 
+                          });
                         })),
               ],
             );
