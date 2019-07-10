@@ -11,15 +11,14 @@ class RawEditor extends StatefulWidget {
 class _RawEditorState extends State<RawEditor> {
   Map<String, Map<String, dynamic>> content;
   List<String> _contentWip = [];
-
   var _controller = TextEditingController();
   String jsonValidationErrorMessage = "";
+  String currentContentKey;
 
   _validateJson(String updatedJson) {
     JsonDecoder decoder = JsonDecoder();
     try {
       decoder.convert(updatedJson);
-      print('Updated data is valid json.');
       jsonValidationErrorMessage = "";
       return true;
     } on FormatException catch (e) {
@@ -32,6 +31,10 @@ class _RawEditorState extends State<RawEditor> {
 
   _updateContent(String updatedJson) {
     _contentWip = [];
+     JsonDecoder decoder = JsonDecoder();
+     var updatedContent = decoder.convert(updatedJson);
+     //Maybe the contentHandler could arrive in the broadcast to avoid this static?
+    ContentHandlerRegistry.updateContent(currentContentKey, updatedContent);
   }
 
   @override
@@ -53,6 +56,7 @@ class _RawEditorState extends State<RawEditor> {
               _controller.text = _contentWip.last;
             } else {
               _controller.text = encoder.convert(content[content.keys.first]);
+              currentContentKey = content.keys.first;
             }
             return Column(
               children: <Widget>[

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:json_to_flutter_editor/components/content_tree.dart';
 import 'package:json_to_flutter_editor/components/raw_editor.dart';
 import 'components/preview.dart';
 import 'editor_state.dart';
@@ -16,8 +17,9 @@ import 'package:provider/provider.dart';
 
 
 void main() {
-  // Enable fullscreen
+  // Enable fullscreen (not 100% ok, when keyboard has show it reappears)
   SystemChrome.setEnabledSystemUIOverlays([]);
+  
   runApp(MyApp());
 }
 
@@ -59,15 +61,13 @@ class MyApp extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: <Widget>[
-          Expanded(
-            child: Column(
-              children: <Widget>[Text("hi")],
-            ),
-          ),
           Container(
+            child: ContentTree(),
+          ),
+          Expanded(child: Container(
             width: 400,
             child:  RawEditor()
-          ),
+          )),
           Container(
             margin: EdgeInsets.only(right: 10),
             child: Preview(),
@@ -86,10 +86,35 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
             title: 'Flutter Demo.',
-            routes: {'/': (context) => getOverviewPage()},
+            routes: {
+              '/': (context) => getOverviewPage(),
+              },
             theme: ThemeData(
               primarySwatch: Colors.blue,
             )));
+  }
+}
+
+class NativePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Text('Splash page'),
+        RaisedButton(
+          child: Text('Click me to go to jtf page'),
+          onPressed: () {
+            Navigator.pushNamed(context, 'jtfScreen');
+          },
+        ),
+        RaisedButton(
+          child: Text('Click me to go to github page'),
+          onPressed: () {
+            Navigator.pushNamed(context, 'jtfScreenGithub');
+          },
+        )
+      ],
+    );
   }
 }
 
