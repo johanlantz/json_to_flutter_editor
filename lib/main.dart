@@ -23,35 +23,9 @@ void main() {
   runApp(MyApp());
 }
 
-Widget getDynamicPage(String contentKey) {
-  // Register our action handlers
-  var actionHandlerRegistry = ActionHandlerRegistry();
-  actionHandlerRegistry.registerActionHandler(ActionHandlerNav());
-  actionHandlerRegistry.registerActionHandler(ActionHandlerPost());
-
-  // Register our content handlers
-  var contentHandlerRegistry = ContentHandlerRegistry();
-  var contentHandlerMem = ContentHandlerMem();
-  contentHandlerMem.registerContent('firstPage', firstPage);
-  contentHandlerMem.registerContent('firstPage', firstPage);
-  contentHandlerMem.registerContent('secondPage', secondPage);
-  contentHandlerMem.registerContent('thirdPage', thirdPage);
-  contentHandlerMem.registerContent('fourthPage', fourthPage);
-  contentHandlerMem.registerContent('fifthPage', fifthPage);
-  contentHandlerMem.registerContent('sixthPage', sixthPage);
-  contentHandlerMem.registerContent('seventhPage', seventhPage);
-  contentHandlerRegistry.registerContentHandler(contentHandlerMem);
-
-  var contentHandlerLink = ContentHandlerLink();
-  contentHandlerLink.registerContent('githubPage1',
-      'https://raw.githubusercontent.com/johanlantz/pages/master/app1/githubPage1');
-  contentHandlerRegistry.registerContentHandler(contentHandlerLink);
-
-  return JSONToFlutter.getPage(
-      contentKey, contentHandlerRegistry, actionHandlerRegistry);
-}
-
 class MyApp extends StatelessWidget {
+
+  
   MyApp() {
     registerExternalWidget("ExternalWidget", ExternalWidgetBuilder());
     //registerExternalWidget('TouchRecorder', TouchRecorderBuilder());
@@ -82,7 +56,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider<EditorState>(
-              builder: (context) => EditorState(getDynamicPage('firstPage'))),
+              builder: (context) => EditorState()),
         ],
         child: MaterialApp(
             title: 'Flutter Demo.',
@@ -92,29 +66,6 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.blue,
             )));
-  }
-}
-
-class NativePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text('Splash page'),
-        RaisedButton(
-          child: Text('Click me to go to jtf page'),
-          onPressed: () {
-            Navigator.pushNamed(context, 'jtfScreen');
-          },
-        ),
-        RaisedButton(
-          child: Text('Click me to go to github page'),
-          onPressed: () {
-            Navigator.pushNamed(context, 'jtfScreenGithub');
-          },
-        )
-      ],
-    );
   }
 }
 

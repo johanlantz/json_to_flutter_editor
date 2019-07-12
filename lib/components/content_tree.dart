@@ -1,5 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:json_to_flutter/content/content_handler_registry.dart';
+import 'package:json_to_flutter/json_to_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../editor_state.dart';
 
 class ContentTree extends StatelessWidget {
   @override
@@ -23,12 +28,15 @@ class ContentTree extends StatelessWidget {
               contentIndex.addAll(snapshot.data[key]);
             });
             
-          
             return Expanded(
               child: 
                 ListView.builder(
                   itemBuilder: (BuildContext context, int i) =>
-                      Text(contentIndex[i]),
+                      RaisedButton(child: Text(contentIndex[i]), onPressed: () {
+                        var editorState = Provider.of<EditorState>(context);
+                        print('pressed ${contentIndex[i]}');
+                        editorState.setDynamicPage(contentIndex[i]);
+                      },),
                   itemCount: contentIndex.length,
                 )
               
